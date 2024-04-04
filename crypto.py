@@ -5,7 +5,7 @@
 import sys 
 
 #to use this with the tkinter shit make sure the button call on tkinter calls
-#varname = subprocess.run(['python3','crypto.py',var]),capture_output = True).stdout
+#varname = subprocess.run(['python','crypto.py',var]),capture_output = True).stdout
 #and initialize var with an input from the user using a tkinter field
 #this script works by performing the call - python3 crypt.py plaintext
 
