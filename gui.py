@@ -3,7 +3,7 @@ import subprocess
 
 def perform_command():
     input_value = input_entry.get()
-    plaintext = subprocess.run(['python3','crypto.py',input_value],capture_output = True).stdout
+    plaintext = subprocess.run(['python','crypto.py',input_value],capture_output = True).stdout
     output_value = "Output: " + plaintext.decode("utf-8")
     output_label.config(text=output_value)
 
