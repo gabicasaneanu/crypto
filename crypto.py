@@ -5,7 +5,7 @@
 import sys 
 
 #to use this with the tkinter shit make sure the button call on tkinter calls
-#varname = subprocess.run(['python','crypto.py',var]),capture_output = True).stdout
+#varname = subprocess.run(['python3','crypto.py',var]),capture_output = True).stdout
 #and initialize var with an input from the user using a tkinter field
 #this script works by performing the call - python3 crypt.py plaintext
 
@@ -229,6 +229,8 @@ def encryption(inp,key,pad,enc):
             realRight = expand(right,expansionMatrix)
             if enc == False:
                 var = xor(keys[x],realRight)
+            elif enc == True:
+                var = xor(keys[15- x],realRight)
             var = computeSBoxes(var)
             var = permute(var, roundMatrix)
             var = xor(left,var)
