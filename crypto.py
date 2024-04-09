@@ -4,14 +4,22 @@
 #https://github.com/anishLearnsToCode/DES
 import sys 
 
-#to use this with the tkinter shit make sure the button call on tkinter calls
-#varname = subprocess.run(['python3','crypto.py',var]),capture_output = True).stdout
+#to use this with the tkinter GUI make sure the button call on tkinter calls
+#varname = subprocess.run(['python','crypto.py',var]),capture_output = True).stdout
 #and initialize var with an input from the user using a tkinter field
 #this script works by performing the call - python3 crypt.py plaintext
 
+
+#Retrieving user input from the CLI
 plaintext = sys.argv[1]
+
+#Statically defined key
 key = '88888888'
 
+
+# DES P-box and S-boxes: Core components of the Data Encryption Standard (DES) algorithm,
+# providing essential bit permutation and substitution operations for secure encryption.
+# Refer to DES standard documentation (e.g., FIPS PUB 46-3) for detailed specifications.
 Sboxes = [
     [
         [14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7],
@@ -78,6 +86,12 @@ roundMatrix =  [
     19, 13, 30, 6, 22, 11, 4, 25
 ]
 
+# DES Final Permutation (FP) Matrix:
+# Specifies the final permutation of the ciphertext bits in the DES algorithm.
+# This 64-bit permutation matrix defines the arrangement of bits after the last round of encryption.
+# It essentially reverses the effect of the initial permutation.
+
+
 finalMatrix = [
     40, 8, 48, 16, 56, 24, 64, 32,
     39, 7, 47, 15, 55, 23, 63, 31,
@@ -89,6 +103,10 @@ finalMatrix = [
     33, 1, 41, 9, 49, 17, 57, 25
 ]
 
+# DES Initial Permutation (IP) Matrix:
+# Specifies the initial permutation of the input plaintext or ciphertext bits in the DES algorithm.
+# This 64-bit permutation matrix defines the initial arrangement of bits before encryption or decryption.
+# Refer to DES standard documentation (e.g., FIPS PUB 46-3) for the exact permutation table.
 
 initialMatrix =  [
     58, 50, 42, 34, 26, 18, 10, 2,
@@ -101,6 +119,11 @@ initialMatrix =  [
     63, 55, 47, 39, 31, 23, 15, 7
 ]
 
+# DES Expansion Permutation (E) Matrix:
+# Specifies the expansion of the 32-bit half-block to 48 bits in the DES Feistel function.
+# This 32-to-48 bit permutation matrix replicates certain bits of the input to create a 48-bit output.
+# The expanded half-block is XORed with the round subkey to introduce diffusion in DES.
+
 expansionMatrix  = [
     32, 1, 2, 3, 4, 5,
     4, 5, 6, 7, 8, 9,
@@ -112,6 +135,11 @@ expansionMatrix  = [
     28, 29, 30, 31, 32, 1
 ]
 
+# DES Key Permutation (PC1) Matrix:
+# Specifies the permutation of the original 64-bit encryption key to derive the 56-bit key used in DES.
+# This 64-to-56 bit permutation matrix selects the key bits used in each round's subkey generation.
+# Refer to DES standard documentation (e.g., FIPS PUB 46-3) for the exact permutation table.
+
 firstKeyMatrix = [
     57, 49, 41, 33, 25, 17, 9,
     1, 58, 50, 42, 34, 26, 18,
@@ -122,6 +150,11 @@ firstKeyMatrix = [
     14, 6, 61, 53, 45, 37, 29,
     21, 13, 5, 28, 20, 12, 4
 ]
+
+# DES Key Schedule Compression (PC2) Matrix:
+# Specifies the compression of a 56-bit round key to a 48-bit subkey used in each round of DES.
+# This 56-to-48 bit permutation matrix selects the bits for the final subkey used in each round.
+# Refer to DES standard documentation (e.g., FIPS PUB 46-3) for the exact permutation table.
 
 secondKeyMatrix = [
     14, 17, 11, 24, 1, 5, 3, 28,
@@ -137,116 +170,140 @@ secondKeyMatrix = [
 
 keyShift = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
 
+#Performs permutation on input array depending on the indices of the reference array
 def permute(box1,box2):
     return ([box1[index -1] for index in box2])
     
+# Performs a bitwise XOR operation between corresponding elements of box1 and box2.    
 def xor(box1,box2):
     return ([index1 ^ index2 for index1,index2 in zip(box1,box2)])
-    
+
+#Identical operation to the permute function    
 def expand(box1,box2):
     return ([box1[index - 1] for index in box2])
-    
+
+#Bitwise shift corresponding to input shift. Then concatenates both box inputs.    
 def leftShift(box1,box2,shift):
     return (box1[shift:] + box1[:shift], box2[shift:] + box2[:shift])
 
+# Splits a given list into sublists of size n.
 def splitArray(list, n):
     return [list[i : i + n] for i in range(0, len(list), n)]
-    
+
+#Converts the input value to its binary representation with a specified size, padding with zeros if necessary.   
 def binaryVal(box1,size):
     binary = bin(box1)[2:] if isinstance(box1,int) else bin(ord(box1))[2:]
     while len(binary) < size:
         binary = '0' + binary
     return (binary)
     
+# Converts a string to a binary representation as a list of integers.    
 def stringToBinary(box1):
     arr = []
     for box in box1:
-        binary = binaryVal(box,8)
+        binary = binaryVal(box,8) 
+        #calls binaryVal function with a size of 8 bits(byte)
         binArr = [int(x) for x in list(binary)]
         arr += binArr
     return (arr)
-    
+ 
+# Converts a binary representation (list of integers) to a string.
 def binaryToString(box1):
-    bytes = splitArray(box1,8)
-    bytesList = []
-    
-    for byte in bytes:
+    split_bytes = splitArray(box1, 8)
+    out_bytes = []
+    for byte in split_bytes:
         bits = []
         for bit in byte:
             bits += str(bit)
-        bytesList.append(''.join(bits))
-    result = ''.join([chr(int(b,2)) for b in bytesList])
-    
-    return(result) 
-    
+        out_bytes.append(''.join(bits))
+    result = ''.join([chr(int(b, 2)) for b in out_bytes])
+    return result
+
+
+# Pads the input string to ensure its length is a multiple of 8.    
 def pad(box1):
     pad = 8 - (len(box1) % 8)
     box1 += chr(pad) * pad
     return (box1)  
-    
+
+# Removes padding from the input string.    
 def unpad(box1):
     pad = ord(box1[-1])
     return data[ : -pad]
       
   
     
+# Generates subkeys for DES encryption based on the given key.
 def keyGen(key):
-    keyArr = []
-    key = stringToBinary(key)
-    key = permute(key, firstKeyMatrix)
-    left,right = splitArray(key,28)
-    
+    subkeys = []
+    key_binary = stringToBinary(key)
+    key_permuted = permute(key_binary, firstKeyMatrix)
+    left_half, right_half = splitArray(key_permuted, 28)
+
     for i in range(16):
-        left,right = leftShift(left,right,keyShift[i])
-        blocks = left+right
-        keyArr.append(permute(blocks,secondKeyMatrix))
+        left_half, right_half = leftShift(left_half, right_half, keyShift[i])
+        key_blocks = left_half + right_half
+        subkeys.append(permute(key_blocks, secondKeyMatrix))
+
+    return subkeys
     
-    return (keyArr)
-    
+# Computes the substitution values for the S-boxes in DES encryption.
 def computeSBoxes(box1):
-    chunks = splitArray(box1,6)
+    chunks = splitArray(box1, 6)
     output = []
     
     for x in range(len(chunks)):
         chunk = chunks[x]
-        index = int(str(chunk[0]) + str(chunk[5]),2)
-        line = int(''.join([str(i) for i in chunk [1:-1]]),2)
-        sbox = Sboxes[x][index][line]
-        binary = binaryVal(sbox,4)
+        index = int(str(chunk[0]) + str(chunk[5]), 2)
+        line = int(''.join([str(i) for i in chunk[1:-1]]), 2)
+        sbox_value = Sboxes[x][index][line]
+        binary = binaryVal(sbox_value, 4)
         output += [int(ind) for ind in binary]
-    return (output)
     
-def encryption(inp,key,pad,enc):
+    return output
+
+    
+# Performs DES encryption or decryption depending on the 'enc' flag.
+def encryption(input_text, key, pad, enc):
     keys = keyGen(key)
-    blocks = splitArray(inp,8)
+    blocks = splitArray(input_text, 8)
     output = []
+    
     for block in blocks:
         block = stringToBinary(block)
         block = permute(block, initialMatrix)
-        left,right = splitArray(block,32)
+        left_half, right_half = splitArray(block, 32)
         var = None
+        
         for x in range(16):
-            realRight = expand(right,expansionMatrix)
+            expanded_right = expand(right_half, expansionMatrix)
             if enc == False:
-                var = xor(keys[x],realRight)
+                var = xor(keys[x], expanded_right)
             elif enc == True:
-                var = xor(keys[15- x],realRight)
+                var = xor(keys[15 - x], expanded_right)
             var = computeSBoxes(var)
             var = permute(var, roundMatrix)
-            var = xor(left,var)
-            left = right
-            right = var
-        output += permute(right + left, finalMatrix)
-    final = binaryToString(output)
-    return(final)
+            var = xor(left_half, var)
+            left_half = right_half
+            right_half = var
+        
+        output += permute(right_half + left_half, finalMatrix)
+    
+    final_output = binaryToString(output)
+    return final_output
 
 
+
+# Orchestrates the encryption process using the provided key and plaintext.
+# If padder is True, pads the plaintext before encryption using a padding function.
 def driver(key,text,padder):
     if padder == True:
         text = pad(text)
     output = encryption(text,key,padder,False)
     return(output)
-           
+
+# Entry point for DES encryption, taking plaintext and encryption key as input.
+# Determines if padding is needed for the plaintext and calls the driver function for encryption.           
 def main(plaintext,key):
     padding = (len(plaintext)% 8 != 0)
     output = driver(key,plaintext,padding)
