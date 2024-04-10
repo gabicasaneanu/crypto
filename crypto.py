@@ -13,8 +13,12 @@ import sys
 #Retrieving user input from the CLI
 plaintext = sys.argv[1]
 
-#Statically defined key
-key = '88888888'
+#Retrieving user key from the CLI
+if len(sys.argv[2]) < 8:
+    print("input key needs to be 8 characters long")
+    quit()
+key = sys.argv[2]
+
 
 
 # DES P-box and S-boxes: Core components of the Data Encryption Standard (DES) algorithm,
