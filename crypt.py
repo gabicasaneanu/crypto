@@ -9,15 +9,28 @@ import sys
 #and initialize var with an input from the user using a tkinter field
 #this script works by performing the call - python3 crypt.py plaintext
 
+try:
+    test = sys.argv[1]
+except:
+    print("usage : crypt.py plaintext 8charkey")
+    quit()
 
 #Retrieving user input from the CLI
+
 plaintext = sys.argv[1]
 
 #Retrieving user key from the CLI
-if len(sys.argv[2]) < 8:
-    print("input key needs to be 8 characters long")
+try:
+    test = sys.argv[2]
+except:
+    print("usage : crypt.py plaintext 8charkey")
     quit()
+    
+
 key = sys.argv[2]
+if len(key) < 8:
+    print("input key needs to be at least 8 characters long")
+    quit()
 
 
 
@@ -191,8 +204,8 @@ def leftShift(box1,box2,shift):
     return (box1[shift:] + box1[:shift], box2[shift:] + box2[:shift])
 
 # Splits a given list into sublists of size n.
-def splitArray(list, n):
-    return [list[i : i + n] for i in range(0, len(list), n)]
+def splitArray(list, x):
+    return [list[i : i + x] for i in range(0, len(list), x)]
 
 #Converts the input value to its binary representation with a specified size, padding with zeros if necessary.   
 def binaryVal(box1,size):
@@ -303,7 +316,7 @@ def encryption(input_text, key, pad, enc):
 def driver(key,text,padder):
     if padder == True:
         text = pad(text)
-    output = encryption(text,key,padder,False)
+    output = encryption(text,key,padder,True)
     return(output)
 
 # Entry point for DES encryption, taking plaintext and encryption key as input.
