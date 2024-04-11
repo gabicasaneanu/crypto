@@ -32,11 +32,11 @@ root.title("Command GUI")
 root.geometry("400x400")
 
 # Create input entry
-plaintext_label = tk.Label(root,text= "Plaintext").place(x = 175,y = 0)
+plaintext_label = tk.Label(root,text= "Plaintext").place(x = 168,y = 0)
 input_entry = tk.Entry(root, width=30)
 input_entry.pack(pady=20)
 
-key_label = tk.Label(root,text = "Key").place(x = 180,y = 80)
+key_label = tk.Label(root,text = "Key").place(x = 185,y = 80)
 key_entry = tk.Entry(root,width = 30)
 key_entry.pack(pady = 40)
 
